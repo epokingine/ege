@@ -4,6 +4,11 @@ version = "0.1.0"
 edition = "2021"
 authors = ["The Epokingine developers"]
 description = "Small easy to use game engine"
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/epokingine/ege/"
+categories = ["game-dev", "game-engine"]
+keywords = ["game-dev", "game", "game-engine"]
 
 [dependencies]
 device_query = "3.0.1"
