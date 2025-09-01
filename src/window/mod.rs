@@ -6,6 +6,7 @@ use log::error;
 pub mod x11;
 
 pub mod color;
+pub mod image;
 
 pub fn window_error() {
     error!("An error occured with the windowing system");
