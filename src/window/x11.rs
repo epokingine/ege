@@ -3,6 +3,7 @@ use std::{
     ffi::{c_int, c_ulong, CString},
     ptr,
 };
+use image::{imageops::FilterType, DynamicImage, GenericImageView};
 use x11::xlib::*;
 
 use super::color::RGBColor;
@@ -40,8 +41,7 @@ impl X11Window {
             let title = CString::new(name).unwrap();
             XStoreName(display, window_addr, title.as_ptr());
 
-            let r = XMapWindow(display, window_addr);
-            println!("map win: {}", r);
+            let _r = XMapWindow(display, window_addr);
 
             let context = XCreateGC(display, window_addr, 0, ptr::null_mut());
 
@@ -54,7 +54,7 @@ impl X11Window {
         }
     }
 
-    pub fn draw_pixel(&self, color: RGBColor, x: u32, y: u32) {
+    pub fn draw_pixel(&self, color: &RGBColor, x: u32, y: u32) {
         self.set_color(color.as_decimal());
         unsafe {
             XDrawPoint(
@@ -89,6 +89,38 @@ impl X11Window {
         }
     }
 
+    pub fn draw_circ(&self, color: &RGBColor, x: i32, y: i32, radius: i32) {
+        let mut r = radius;
+
+        while r != 0 {
+            let mut dx = 0;
+            let mut dy = r;
+            let mut p = 1 - r;
+
+            while dx <= dy {
+                self.draw_pixel(color, (x + dx) as u32, (y + dy) as u32);
+                self.draw_pixel(color, (x + dy) as u32, (y + dx) as u32);
+                self.draw_pixel(color, (x - dx) as u32, (y + dy) as u32);
+                self.draw_pixel(color, (x - dy) as u32, (y + dx) as u32);
+
+                self.draw_pixel(color, (x + dx) as u32, (y - dy) as u32);
+                self.draw_pixel(color, (x + dy) as u32, (y - dx) as u32);
+                self.draw_pixel(color, (x - dx) as u32, (y - dy) as u32);
+                self.draw_pixel(color, (x - dy) as u32, (y - dx) as u32);
+
+                if p < 0 {
+                    p += 2 * dx + 3;
+                } else {
+                    p += 2 * (dx - dy) + 5;
+                    dy -= 1;
+                }
+
+                dx += 1;
+            }
+            r -= 1;
+        }
+    }
+
     fn set_color(&self, color: u32) {
         unsafe {
             XSetForeground(self.x11_display, self.x11_context, color as c_ulong);
@@ -98,6 +130,25 @@ impl X11Window {
     pub fn clear_window(&self) {
         unsafe {
             XClearWindow(self.x11_display, self.window_addr);
+        }
+    }
+
+    /// Draws an image, ``sx`` and ``sy`` sets the size of the image, if ``sx`` and ``sy`` are set to ``0`` the size of the image will not change,
+    /// if ``sx`` and ``sy`` are not ``0`` the image will be scaled to that size.
+    pub fn draw_image(&self, x: u32, y: u32, sx: u32, sy: u32, image: DynamicImage) {
+        let image = if sx == 0 && sy == 0 {
+            image
+        } else {
+            image.resize(sx, sy, FilterType::Nearest)
+        };
+        let image_size = image.dimensions();
+
+        for dy in 0..image_size.1 {
+            for dx in 0..image_size.0 {
+                let pixel_color = image.get_pixel(dx, dy);
+                let color = RGBColor(pixel_color[0], pixel_color[1], pixel_color[2]);
+                self.draw_pixel(&color, x + dx, y + dy);
+            }
         }
     }
 

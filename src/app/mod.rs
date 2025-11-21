@@ -95,9 +95,7 @@ impl App {
 
     pub fn update_entity(&mut self, id: u64, entity: Entity) {
         for i in 0..self.enities.len() {
-            println!("searching for entity: {} -- {:?}", id, self.enities[0].id);
             if self.enities[i].id == id {
-                println!("found entity");
                 self.enities[i] = entity;
                 return;
             }

@@ -80,7 +80,7 @@ fn main() {
 
     app.add_window(200, 200);
     app.add_window_handler(window_handler);
-    app.add_delay(Duration::from_millis(25));
+    app.add_delay(Duration::from_millis(55));
 
     app.start();
 }
