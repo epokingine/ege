@@ -41,7 +41,7 @@ impl X11Window {
             let title = CString::new(name).unwrap();
             XStoreName(display, window_addr, title.as_ptr());
 
-            let r = XMapWindow(display, window_addr);
+            let _r = XMapWindow(display, window_addr);
 
             let context = XCreateGC(display, window_addr, 0, ptr::null_mut());
 
@@ -133,7 +133,8 @@ impl X11Window {
         }
     }
 
-    /// Draws an image, ``sx`` and ``sy`` sets the size of the image, if ``sx`` and ``sy`` are set to ``0`` the size of the image will not change
+    /// Draws an image, ``sx`` and ``sy`` sets the size of the image, if ``sx`` and ``sy`` are set to ``0`` the size of the image will not change,
+    /// if ``sx`` and ``sy`` are not ``0`` the image will be scaled to that size.
     pub fn draw_image(&self, x: u32, y: u32, sx: u32, sy: u32, image: DynamicImage) {
         let image = if sx == 0 && sy == 0 {
             image

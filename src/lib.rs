@@ -9,6 +9,7 @@ pub mod entity;
 pub mod events;
 pub mod input;
 pub mod math;
+pub mod ui;
 pub mod window;
 
 #[macro_use]

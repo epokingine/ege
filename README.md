@@ -13,5 +13,5 @@ With very limited implementation you can define any data structure and easily st
 Entities can be linked together allowing developers to manage them easily.
 
 ## Requirements:
-    - rustc v1.81.0+
-    - X11 v1.20.0+
+- rustc v1.81.0+
+- X11 v1.20.0+
